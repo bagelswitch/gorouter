@@ -206,6 +206,17 @@ func (r *Router) SendStartMessage() {
 
 	// Send start message once at start
 	r.mbusClient.Publish("router.start", b)
+	
+	go func() {
+                t := time.NewTicker(r.config.StartResponseDelayInterval)
+
+                for {
+                        select {
+                        case <-t.C:
+                                r.mbusClient.Publish("router.start", b)
+                        }
+                }
+        }()
 }
 
 func (r *Router) ScheduleFlushApps() {
